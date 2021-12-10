@@ -4,6 +4,7 @@ const uuid = require("uuid");
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
 const getCoordsForAddress = require("../util/location");
+const Place = require("../models/place");
 
 let DUMMY_PLACES = [
   {
@@ -59,16 +60,22 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  const createdPlace = {
-    id: uuid.v4(),
-    title,  // => title => (similar to) => title: title,
+  const createdPlace = new Place({
+    title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
+    image: "https://images.unsplash.com/photo-1528291151377-165f5107c82a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8ZW1waXJlJTIwc3RhdGUlMjBidWlsZGluZ3xlbnwwfHwwfHw%3D&w=1000&q=80",
     creator
-  };
+  });
 
-  DUMMY_PLACES.push(createdPlace);  // unshift(createPlace) -- to put at first index 
+  try {
+    await createdPlace.save();
+  } catch(err) {
+    // HTTP code 500 - Internal Server Error
+    const error = new HttpError("Creating place failed, please try again", 500);
+    return next(error);
+  }
   
   res.status(201).json({place: createdPlace});
 };
