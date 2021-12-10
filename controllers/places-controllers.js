@@ -20,26 +20,41 @@ let DUMMY_PLACES = [
   },
 ];
 
-const getPlaceById = (req, res, next) => {
+const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
-  const place = DUMMY_PLACES.find((p) => p.id === placeId);
+  let place;
 
-  if (!place) {
-    throw new HttpError("Could not find a place for the provided id.", 404);
+  try {
+    place = await Place.findById(placeId).exec();
+  } catch(err) {
+    const error = new HttpError("Something went wrong, could not find a place", 500);
+    return next(error);
   }
 
-  res.json({ place }); // => { place } => { place: place }
+  if (!place) {
+    const error = new HttpError("Could not find a place for the provided id.", 404);
+    return next(error);
+  }
+
+  res.json({ place: place.toObject({ getters: true }) }); // => { place } => { place: place }
 }
 
-const getPlacesByUserId = (req, res, next) => {
+const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
-  const places = DUMMY_PLACES.filter((u) => u.creator === userId);
+  
+  let places;
+  try {
+    places = await Place.find({ creator: userId }).exec();
+  } catch(err) {
+    const error = new HttpError("Fetching places failed, please try again later", 500);
+    return next(error);
+  }
 
   if (!places || places.length === 0) {
     return next(new HttpError("Could not find places for the provided user id.", 404));
   }
 
-  res.json({ places });
+  res.json({ places: places.map(place => place.toObject({ getters: true })) });
 }
 
 const createPlace = async (req, res, next) => {
