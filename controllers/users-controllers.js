@@ -4,15 +4,6 @@ const { validationResult } = require("express-validator");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
 
-const DUMMY_USERS = [
-  {
-    id: "u1",
-    name: "Syeda Marium",
-    email: "test@test.com",
-    password: "#testers",
-  },
-];
-
 const getUsers = async (req, res, next) => {
   let users;
   try {
@@ -33,7 +24,7 @@ const signup = async (req, res, next) => {
     return next(new HttpError("Invalid inputs passsed, please check your data.", 422));
   }
   
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   const createdUser = new User({
     // id: uuid.v4(),
@@ -41,7 +32,7 @@ const signup = async (req, res, next) => {
     email,
     image: "https://cdn2.vectorstock.com/i/thumb-large/41/11/flat-business-woman-user-profile-avatar-icon-vector-4334111.jpg",
     password,
-    places
+    places: []
   });
 
   let existingUser; 
