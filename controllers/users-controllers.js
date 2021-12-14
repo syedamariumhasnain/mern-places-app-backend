@@ -7,45 +7,57 @@ const User = require("../models/user");
 const getUsers = async (req, res, next) => {
   let users;
   try {
-    // users = User.find({}, "email name");  // Returns email and name of all users    
-    users = await User.find({}, "-password");  // Returns all data fields except password of all users 
-  } catch(err) {
-    const error = new HttpError("Fetching users failed, please try again later.", 500);
+    // users = User.find({}, "email name");  // Returns email and name of all users
+    users = await User.find({}, "-password"); // Returns all data fields except password of all users
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching users failed, please try again later.",
+      500
+    );
     return next(error);
   }
 
-  res.json({ users: users.map(user => user.toObject({ getters: true })) });
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
-  if(!errors.isEmpty()){
+  if (!errors.isEmpty()) {
     console.log(errors);
-    return next(new HttpError("Invalid inputs passsed, please check your data.", 422));
+    return next(
+      new HttpError("Invalid inputs passsed, please check your data.", 422)
+    );
   }
-  
+
   const { name, email, password } = req.body;
 
   const createdUser = new User({
     // id: uuid.v4(),
     name,
     email,
-    image: "https://cdn2.vectorstock.com/i/thumb-large/41/11/flat-business-woman-user-profile-avatar-icon-vector-4334111.jpg",
+    image:
+      "https://cdn2.vectorstock.com/i/thumb-large/41/11/flat-business-woman-user-profile-avatar-icon-vector-4334111.jpg",
     password,
-    places: []
+    places: [],
   });
 
-  let existingUser; 
+  let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
-    if(existingUser) {
+    if (existingUser) {
       // HTTP code 422 - Invalid User Input
-      const error = new HttpError("Could not create user, email already exists.", 422);
+      const error = new HttpError(
+        "Could not create user, email already exists.",
+        422
+      );
       return next(error);
     }
     await createdUser.save();
-  } catch(err) {
-    const error = new HttpError("Signing up failed, please try again later.", 500);
+  } catch (err) {
+    const error = new HttpError(
+      "Signing up failed, please try again later.",
+      500
+    );
     return next(error);
   }
 
@@ -55,20 +67,26 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  let existingUser; 
+  let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
-    if(!existingUser || existingUser.password !== password) {
+    if (!existingUser || existingUser.password !== password) {
       // HTTP code 401 - Authentication Fails
-      const error = new HttpError("Could not identify user, credentials seem to be wrong", 401);
+      const error = new HttpError(
+        "Could not identify user, credentials seem to be wrong",
+        401
+      );
       return next(error);
     }
-  } catch(err) {
+  } catch (err) {
     const error = new HttpError("Login failed, please try again later.", 500);
     return next(error);
   }
 
-  res.json({ message: "Logged in!" });
+  res.json({
+    message: "Logged in!",
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 exports.getUsers = getUsers;
