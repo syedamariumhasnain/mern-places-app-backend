@@ -1,5 +1,7 @@
 // Controllers for LOGIC / MIDDLEWARE FUNCTIONS
 
+const fs = require("fs");
+
 const uuid = require("uuid");
 const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
@@ -163,6 +165,7 @@ const updatePlace = async (req, res, next) => {
 const deletePlace = async (req, res, next) => {
   const placeId = req.params.pid;
   let place;
+  let imagePath;
 
   try {
     // Place.creator ---(has property)---> ref: "User"
@@ -174,6 +177,8 @@ const deletePlace = async (req, res, next) => {
       const error = new HttpError("Could not find place for this id", 404);
       return next(error);
     }
+
+    imagePath = place.image;
 
     const sess = await mongoose.startSession();
     sess.startTransaction();
@@ -191,6 +196,10 @@ const deletePlace = async (req, res, next) => {
     );
     return next(error);
   }
+
+   fs.unlink(imagePath, err => {
+     console.log(err);
+   });
 
   res.status(200).json({ message: "Deleted place." });
 };
