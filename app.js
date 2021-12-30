@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -12,6 +15,16 @@ const app = express();
 // convert in regular JS data structure (object, array, ...) and automatically
 // call next(), to reach next middleware inline
 app.use(bodyParser.json());
+
+// express.static() -- returns special middleware build into express
+// this middleware returns requested file. static serving means just 
+// returning a file, don't execute it.
+// It takes arg. that defines which files in which folders express static
+// can return. the arg. is a path pointing at the folder that serve files
+// This path has to be absolute path, we can built with path module. so, 
+// the other files are locked down but files in this folder are accessable
+// when reequested.
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -33,6 +46,11 @@ app.use((req, res, next) => {
 
 // Default Error Handler
 app.use((error, req, res, next) => {
+  if(req.file) {
+    fs.unlink(req.file.path, err => {
+      console.log(err);
+    })
+  }
   if (res.headerSent) {
     return next(error);
   }

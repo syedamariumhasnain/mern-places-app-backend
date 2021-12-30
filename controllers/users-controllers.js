@@ -35,8 +35,8 @@ const signup = async (req, res, next) => {
     // id: uuid.v4(),
     name,
     email,
-    image:
-      "https://cdn2.vectorstock.com/i/thumb-large/41/11/flat-business-woman-user-profile-avatar-icon-vector-4334111.jpg",
+    // image: "http://localhost:5000/" + req.file.path,
+    image: req.file.path,  // uploads/images/filename
     password,
     places: [],
   });
