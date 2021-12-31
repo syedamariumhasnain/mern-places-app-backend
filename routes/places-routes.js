@@ -5,12 +5,18 @@ const { check } = require("express-validator");
 
 const placesControllers = require("../controllers/places-controllers");
 const fileUpload = require("../middleware/file-upload");
+const checkAuth = require("../middleware/check-auth");
 
 const router = express.Router();
 
 router.get("/:pid", placesControllers.getPlaceById);
 
 router.get("/user/:uid", placesControllers.getPlacesByUserId);
+
+// The above 2 requests don't need to be accessed by only 
+// authenticated user but 3 requests below need authentication 
+
+router.use(checkAuth);
 
 // we can put multiple middleware functions after path in a middleware,
 // that are executed from left to right
