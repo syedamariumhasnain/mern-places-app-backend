@@ -154,6 +154,7 @@ const updatePlace = async (req, res, next) => {
   }
 
   if(place.creator.toString() !== req.userData.userId) {
+    // HTTP code 401 - Authentication Fails or Un-authorized user
     const error = new HttpError(
       "You are not allowed to edit this place.",
       401
@@ -188,14 +189,30 @@ const deletePlace = async (req, res, next) => {
     // Using populate, "creator" gave us full "User" object linked to that place.
 
     place = await Place.findById(placeId).populate("creator");
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not delete place.",
+      500
+    );
+    return next(error);
+  }
 
-    if (!place) {
-      const error = new HttpError("Could not find place for this id", 404);
-      return next(error);
-    }
+  if (!place) {
+    const error = new HttpError("Could not find place for this id", 404);
+    return next(error);
+  }
 
-    imagePath = place.image;
+  if (place.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      "You are not allowed to delete this place.",
+      401
+    );
+    return next(error);
+  }
 
+  imagePath = place.image;
+
+  try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
 

@@ -121,10 +121,10 @@ const login = async (req, res, next) => {
   }
 
   if (!existingUser) {
-    // HTTP code 401 - Authentication Fails
+    // HTTP code 403 - Forbidden (in general) 
     const error = new HttpError(
       "Invalid credentials, could not log you in.",
-      401
+      403
     );
     return next(error);
   }
@@ -143,7 +143,7 @@ const login = async (req, res, next) => {
   if (!isValidPassword) {
     const error = new HttpError(
       "Invalid credentials, could not log you in.",
-      401
+      403
     );
     return next(error);
   }
