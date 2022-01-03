@@ -1,0 +1,9 @@
+{
+  "env": {
+    "DB_USER": "marium",
+    "DB_PASSWORD": "marium27",
+    "DB_NAME": "mern_places_app",
+    "GOOGLE_API_KEY": "// your API KEY goes here //",
+    "JWT_KEY": "supersecret_dont_share"
+  }
+}

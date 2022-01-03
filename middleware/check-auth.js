@@ -28,7 +28,7 @@ module.exports = (req, res, next) => {
     // using the same. jwt.verify() returns a string or an object.
     // It returns the payload that was encoded into the token
     // So, our token should return userId and email
-    const decodedToken = jwt.verify(token, "supersecret_dont_share");
+    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
     // if verification fails in case, can be catch in our catch block
 
     // we can always add data dynamically to the request object
