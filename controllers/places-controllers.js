@@ -76,13 +76,13 @@ const createPlace = async (req, res, next) => {
   if (!errors.isEmpty()) {
     console.log(errors);
     // Woking with express, throw will not work correctly with async func.
-    // So we wil always use next in async function
+    // So we will always use next in async function
     return next(
       new HttpError("Invalid inputs passsed, please check your data.", 422)
     );
   }
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body;
 
   let coordinates;
   try {
@@ -97,12 +97,12 @@ const createPlace = async (req, res, next) => {
     address,
     location: coordinates,
     image: req.file.path,
-    creator,
+    creator: req.userData.userId,
   });
 
   let user;
   try {
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
 
     if (!user) {
       const error = new HttpError("Could not find user for provided id", 404);
