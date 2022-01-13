@@ -9,13 +9,16 @@ const Schema = mongoose.Schema;
 // This unique will not check, if the value is unique in database 
 // For that we need: npm install --save mongoose-unique-validator
 
-const userSchema = new Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true, minlength: 6 },
-  image: { type: String, required: true },
-  places: [{ type: mongoose.Types.ObjectId, required: true, ref: "Place" }]
-});
+const userSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true, minlength: 6 },
+    image: { type: String, required: true },
+    places: [{ type: mongoose.Types.ObjectId, required: true, ref: "Place" }],
+  },
+  { timestamps: true }
+);
 
 userSchema.plugin(uniqueValidator);
 
